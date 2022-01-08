@@ -20,6 +20,8 @@
 // to call an external function between each step. Define an API
 // that allows to register a function or an abstract class modeling
 // a payoff.
+
+// This is a test from Valentin
 int main(int argc, const char * argv[])
 {
     return 0;
