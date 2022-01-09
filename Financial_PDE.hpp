@@ -9,6 +9,8 @@ class Financial_PDE {
 public:
 
 	virtual ~Financial_PDE() = default;
+	
+	Financial_PDE(Option* Opt);
 	// Or "Option* Opt;" ??
 
 	//=== coefficients
@@ -16,8 +18,10 @@ public:
 	virtual double coeff_b() const;  
 	virtual double coeff_c() const;
 	virtual double coeff_d() const; 
+	
 
 protected:
+	Option* Opt_;
 
 private:
 
@@ -28,8 +32,8 @@ private:
 class BS_PDE:public Financial_PDE{
 
 public:
-	Option* Opt;
-	BS_PDE(const Option& _Opt);
+	
+	BS_PDE(Option* Opt);
 
 
 	//=== BS coefficients
