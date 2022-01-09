@@ -9,6 +9,12 @@ public:
 	Payoff();
 
 	virtual double operator()(const double& s) const = 0; //pure virtual function, we overload the operator () for PayOff to be a functor.
+	virtual Payoff* clone() const = 0;
+
+protected:
+
+	const double& get_K() const;
+	Payoff(const double& K);
 
 private:
 
@@ -24,12 +30,10 @@ public:
 	CallPayoff(const double& K);
 
 	virtual double operator()(const double& s) const;
-
-private:
-
-	double K_;
+	Payoff* clone() const override;
 
 };
+
 
 class PutPayoff : public Payoff {
 
@@ -39,9 +43,7 @@ public:
 	PutPayoff(const double& K);
 
 	virtual double operator()(const double& s) const;
-
-private:
-
-	double K_;
+	Payoff* clone() const override;
 
 };
+
