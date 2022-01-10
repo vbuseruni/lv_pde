@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <Eigen/Dense>
 #include "Financial_PDE.hpp"
 
 class BoundaryConditions
@@ -9,21 +10,19 @@ public:
 	virtual ~BoundaryConditions() = default;
 	//BoundaryConditions();
 
-
-protected:
-
-	Financial_PDE* pde_;
+	Financial_PDE* pde_; // had to pass the financial_PDE pointer to public for it to be accessible from a pointer to BoundaryCondition object.
 
 	const double& get_dx() const;
 	const double& get_dt() const;
 	const double& get_theta() const;
+	virtual Eigen::MatrixXd coeff_fn() const = 0;
+	virtual Eigen::MatrixXd coeff_fn1() const = 0;
+
+protected:
+
+	
 	BoundaryConditions(Financial_PDE* pde, const double& dx, const double& dt, const double& theta);
 
-	/*
-	
-	*/
-	virtual std::vector<double> coeff_fn() const = 0;
-	virtual std::vector<double> coeff_fn1() const = 0;
 
 private:
 
@@ -39,11 +38,12 @@ class Boundaryx0: public BoundaryConditions
 public:
 
 	Boundaryx0(Financial_PDE* pde, const double& dx, const double& dt, const double& theta);
+	virtual Eigen::MatrixXd coeff_fn() const override;
+	virtual Eigen::MatrixXd coeff_fn1() const override;
 
 protected:
 
-	virtual std::vector<double> coeff_fn() const override;
-	virtual std::vector<double> coeff_fn1() const override;
+	
 	
 
 private:
@@ -64,11 +64,12 @@ class BoundaryxN : public BoundaryConditions
 public:
 
 	BoundaryxN(Financial_PDE* pde, const double& dx, const double& dt, const double& theta);
+	virtual Eigen::MatrixXd coeff_fn() const override;
+	virtual Eigen::MatrixXd coeff_fn1() const override;
 
 protected:
 
-	virtual std::vector<double> coeff_fn() const override;
-	virtual std::vector<double> coeff_fn1() const override;
+	
 
 private:
 
