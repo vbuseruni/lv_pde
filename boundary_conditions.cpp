@@ -54,22 +54,22 @@ double Boundaryx0::mu_x0() const
 	return mu;
 }
 
-std::vector<double> Boundaryx0::coeff_fn1() const
+Eigen::MatrixXd Boundaryx0::coeff_fn1() const
 {
-	std::vector<double> res(3, 0.0);
-	res[0] = 1 - get_dt() * (1 - get_theta()) * Boundaryx0::gamma_x0();
-	res[1] = - get_dt() * (1 - get_theta()) * Boundaryx0::vega_x0();
-	res[2] = - get_dt() * (1 - get_theta()) * Boundaryx0::mu_x0();
+	Eigen::MatrixXd res = Eigen::MatrixXd::Zero(1,3);
+	res(0) = 1 - get_dt() * (1 - get_theta()) * Boundaryx0::gamma_x0();
+	res(1) = - get_dt() * (1 - get_theta()) * Boundaryx0::vega_x0();
+	res(2) = - get_dt() * (1 - get_theta()) * Boundaryx0::mu_x0();
 
 	return res;
 }
 
-std::vector<double> Boundaryx0::coeff_fn() const
+Eigen::MatrixXd Boundaryx0::coeff_fn() const
 {
-	std::vector<double> res(3, 0.0);
-	res[0] = 1 + get_dt() * get_theta() * Boundaryx0::gamma_x0();
-	res[1] = get_dt() * get_theta() * Boundaryx0::vega_x0();
-	res[2] = get_dt() * get_theta() * Boundaryx0::mu_x0();
+	Eigen::MatrixXd res = Eigen::MatrixXd::Zero(1, 3);
+	res(0) = 1 + get_dt() * get_theta() * Boundaryx0::gamma_x0();
+	res(1) = get_dt() * get_theta() * Boundaryx0::vega_x0();
+	res(2) = get_dt() * get_theta() * Boundaryx0::mu_x0();
 
 	return res;
 }
@@ -99,22 +99,22 @@ double BoundaryxN::mu_xN() const
 	return mu;
 }
 
-std::vector<double> BoundaryxN::coeff_fn1() const
+Eigen::MatrixXd BoundaryxN::coeff_fn1() const
 {
-	std::vector<double> res(3, 0.0);
-	res[0] = 1 - get_dt() * (1 - get_theta()) * BoundaryxN::gamma_xN();
-	res[1] = -get_dt() * (1 - get_theta()) * BoundaryxN::vega_xN();
-	res[2] = -get_dt() * (1 - get_theta()) * BoundaryxN::mu_xN();
+	Eigen::MatrixXd res = Eigen::MatrixXd::Zero(1, 3);
+	res(2) = 1 - get_dt() * (1 - get_theta()) * BoundaryxN::gamma_xN();
+	res(1) = -get_dt() * (1 - get_theta()) * BoundaryxN::vega_xN();
+	res(0) = -get_dt() * (1 - get_theta()) * BoundaryxN::mu_xN();
 
 	return res;
 }
 
-std::vector<double> BoundaryxN::coeff_fn() const
+Eigen::MatrixXd BoundaryxN::coeff_fn() const
 {
-	std::vector<double> res(3, 0.0);
-	res[0] = 1 + get_dt() * get_theta() * BoundaryxN::gamma_xN();
-	res[1] = get_dt() * get_theta() * BoundaryxN::vega_xN();
-	res[2] = get_dt() * get_theta() * BoundaryxN::mu_xN();
+	Eigen::MatrixXd res = Eigen::MatrixXd::Zero(1, 3);
+	res(2) = 1 + get_dt() * get_theta() * BoundaryxN::gamma_xN();
+	res(1) = get_dt() * get_theta() * BoundaryxN::vega_xN();
+	res(0) = get_dt() * get_theta() * BoundaryxN::mu_xN();
 
 	return res;
 }
