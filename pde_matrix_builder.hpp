@@ -7,9 +7,9 @@
 
 /*
 Basically this class constructs the matrices that are in the system of the Theta Scheme, where me have
-$Kf^{n+1} = \tilde{K} f^n + dt * d$, where $d \in \R^{T+1}$ is a vector where all the elements are equal to d(x,t), the term of the PDE
+$Kf^{n+1} = \tilde{K} f^n + dt * d$, where $d \in \R^{N+1}$ is a vector where all the elements are equal to d(x,t), the term of the PDE
 which is equal to zero in the Black-Scholes PDE.
-As such, this builds the matrices $K$ and $\tilde{K}$ that are of dimensions $T+1 x T+1$, with $\{0, ..., T\}$ the time steps on the mesh. 
+As such, this builds the matrices $K$ and $\tilde{K}$ that are of dimensions $N+1 x N+1$, with $\{0, ..., N\}$ the spot steps on the mesh. 
 */
 
 /*
@@ -28,28 +28,27 @@ class PDEMatrixBuilder
 public:
 
 	virtual ~PDEMatrixBuilder() = default;
-	PDEMatrixBuilder(BoundaryConditions* boundaries_x0, BoundaryConditions* boundaries_xN, const int& nb_time_steps);
-	Eigen::MatrixXd comp_k() const;
-	Eigen::MatrixXd comp_ktilde() const;
-	const int& get_nb_time_steps() const;
+	PDEMatrixBuilder(BoundaryConditions* boundaries_x0, BoundaryConditions* boundaries_xN);
+	Eigen::MatrixXd comp_k(const int& nb_spot_steps, const double& dx, const double& dt) const;
+	Eigen::MatrixXd comp_ktilde(const int& nb_spot_steps, const double& dx, const double& dt) const;
+	BoundaryConditions* boundaries_x0_;
+	BoundaryConditions* boundaries_xN_;
 
+	Eigen::MatrixXd comp_system_constant(const int& nb_spot_steps, const double& dx, const double& dt) const; //compute the constant vector in the system
 
 protected:
 
-	BoundaryConditions* boundaries_x0_;
-	BoundaryConditions* boundaries_xN_;
+	
 	
 private:
 
-	int nb_time_steps_;
+	double alpha(const double& dx, const double& dt) const;
+	double beta(const double& dx, const double& dt) const;
+	double xi(const double& dx, const double& dt) const;
 
-	double alpha() const;
-	double beta() const;
-	double xi() const;
-
-	Eigen::MatrixXd comp_system_constant() const; //compute the constant vector in the system
-	Eigen::MatrixXd comp_row_ktilde() const;
-	Eigen::MatrixXd comp_row_k() const;
+	
+	Eigen::MatrixXd comp_row_ktilde(const double& dx, const double& dt) const;
+	Eigen::MatrixXd comp_row_k(const double& dx, const double& dt) const;
 	
 
 };

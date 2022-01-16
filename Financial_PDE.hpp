@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FINANCIAL_PDE_HPP
 #define FINANCIAL_PDE_HPP
 
@@ -9,19 +10,19 @@ class Financial_PDE {
 public:
 
 	virtual ~Financial_PDE() = default;
-	
+
 	Financial_PDE(Option* Opt);
 	// Or "Option* Opt;" ??
 
 	//=== coefficients
-	virtual double coeff_a() const; // ou (double t, double x)
-	virtual double coeff_b() const;  
-	virtual double coeff_c() const;
-	virtual double coeff_d() const; 
-	
+	virtual double coeff_a() const = 0; // ou (double t, double x)
+	virtual double coeff_b() const = 0;
+	virtual double coeff_c() const = 0;
+	virtual double coeff_d() const = 0;
+	Option* Opt_;
 
 protected:
-	Option* Opt_;
+	
 
 private:
 
@@ -29,20 +30,20 @@ private:
 
 };
 
-class BS_PDE:public Financial_PDE{
+class BS_PDE :public Financial_PDE {
 
 public:
-	
+
 	BS_PDE(Option* Opt);
 
 
 	//=== BS coefficients
-	
-	
+
+
 	double coeff_a() const; // ou (double t, double x)
 	double coeff_b() const;
-	double coeff_c() const;  
-	double coeff_d() const; 
+	double coeff_c() const;
+	double coeff_d() const;
 
 protected:
 
@@ -52,4 +53,3 @@ private:
 };
 
 #endif
-
