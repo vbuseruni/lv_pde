@@ -12,22 +12,18 @@ public:
 
 	Financial_PDE* pde_; // had to pass the financial_PDE pointer to public for it to be accessible from a pointer to BoundaryCondition object.
 
-	const double& get_dx() const;
-	const double& get_dt() const;
 	const double& get_theta() const;
-	virtual Eigen::MatrixXd coeff_fn() const = 0;
-	virtual Eigen::MatrixXd coeff_fn1() const = 0;
+	virtual Eigen::MatrixXd coeff_fn(const double& dx, const double& dt) const = 0;
+	virtual Eigen::MatrixXd coeff_fn1(const double& dx, const double& dt) const = 0;
 
 protected:
 
 	
-	BoundaryConditions(Financial_PDE* pde, const double& dx, const double& dt, const double& theta);
+	BoundaryConditions(Financial_PDE* pde, const double& theta);
 
 
 private:
 
-	double dx_;
-	double dt_;
 	double theta_;
 
 };
@@ -37,9 +33,9 @@ class Boundaryx0: public BoundaryConditions
 
 public:
 
-	Boundaryx0(Financial_PDE* pde, const double& dx, const double& dt, const double& theta);
-	virtual Eigen::MatrixXd coeff_fn() const override;
-	virtual Eigen::MatrixXd coeff_fn1() const override;
+	Boundaryx0(Financial_PDE* pde, const double& theta);
+	virtual Eigen::MatrixXd coeff_fn(const double& dx, const double& dt) const override;
+	virtual Eigen::MatrixXd coeff_fn1(const double& dx, const double& dt) const override;
 
 protected:
 
@@ -53,9 +49,9 @@ private:
 	double vega_x0(double& dx) const;
 	double mu_x0(double& dx) const;
 	*/
-	double gamma_x0() const;
-	double vega_x0() const;
-	double mu_x0() const;
+	double gamma_x0(const double& dx, const double& dt) const;
+	double vega_x0(const double& dx, const double& dt) const;
+	double mu_x0(const double& dx, const double& dt) const;
 };
 
 class BoundaryxN : public BoundaryConditions
@@ -63,9 +59,9 @@ class BoundaryxN : public BoundaryConditions
 
 public:
 
-	BoundaryxN(Financial_PDE* pde, const double& dx, const double& dt, const double& theta);
-	virtual Eigen::MatrixXd coeff_fn() const override;
-	virtual Eigen::MatrixXd coeff_fn1() const override;
+	BoundaryxN(Financial_PDE* pde, const double& theta);
+	virtual Eigen::MatrixXd coeff_fn(const double& dx, const double& dt) const override;
+	virtual Eigen::MatrixXd coeff_fn1(const double& dx, const double& dt) const override;
 
 protected:
 
@@ -78,9 +74,9 @@ private:
 	double vega_x0(double& dx) const;
 	double mu_x0(double& dx) const;
 	*/
-	double gamma_xN() const;
-	double vega_xN() const;
-	double mu_xN() const;
+	double gamma_xN(const double& dx, const double& dt) const;
+	double vega_xN(const double& dx, const double& dt) const;
+	double mu_xN(const double& dx, const double& dt) const;
 };
 
 

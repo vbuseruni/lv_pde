@@ -5,10 +5,10 @@
 #include <iterator>
 #include <math.h> 
 
-Option::Option(Payoff* payoff, const double& K, const double& vol, const double& T, const double& rate) : m_payoff(payoff),m_K(K),m_vol(vol),m_T(T),m_rate(rate){}
+Option::Option(Payoff* payoff, const double& K, const double& vol, const double& T, const double& rate) : m_payoff(payoff), m_K(K), m_vol(vol), m_T(T), m_rate(rate) {}
 
 
-VanillaOption::VanillaOption(Payoff* payoff, const double& K, const double& vol, const double& T, const double& rate) : Option(payoff,K,vol,T,rate){}
+VanillaOption::VanillaOption(Payoff* payoff, const double& K, const double& vol, const double& T, const double& rate) : Option(payoff, K, vol, T, rate) {}
 
 double Option::get_K() const
 {

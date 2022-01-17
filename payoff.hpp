@@ -6,10 +6,11 @@ class Payoff {
 public:
 
 	virtual ~Payoff() = default; // virtual destructor
-	Payoff();
+	//Payoff();
 
 	virtual double operator()(const double& s) const = 0; //pure virtual function, we overload the operator () for PayOff to be a functor.
 	virtual Payoff* clone() const = 0;
+	
 
 protected:
 

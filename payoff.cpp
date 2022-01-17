@@ -5,7 +5,7 @@
 
 // BASE CLASSE:
 
-Payoff::Payoff() {}
+//Payoff::Payoff() {}
 
 const double& Payoff::get_K() const 
 {
@@ -42,7 +42,7 @@ PutPayoff::PutPayoff(const double& K) : Payoff(K)
 
 double PutPayoff::operator()(const double& s) const
 {
-	return std::max(s - get_K(), 0.0);
+	return std::max(get_K() - s, 0.0);
 }
 
 Payoff* PutPayoff::clone() const

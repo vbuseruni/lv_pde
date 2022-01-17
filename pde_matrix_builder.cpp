@@ -6,87 +6,83 @@
 #include "pde_matrix_builder.hpp"
 
 
-const int& PDEMatrixBuilder::get_nb_time_steps() const
-{
-	return nb_time_steps_;
-}
 
-PDEMatrixBuilder::PDEMatrixBuilder(BoundaryConditions* boundaries_x0, BoundaryConditions* boundaries_xN, const int& nb_time_steps) :
-	boundaries_x0_(boundaries_x0), boundaries_xN_(boundaries_xN), nb_time_steps_(nb_time_steps)
+PDEMatrixBuilder::PDEMatrixBuilder(BoundaryConditions* boundaries_x0, BoundaryConditions* boundaries_xN) :
+	boundaries_x0_(boundaries_x0), boundaries_xN_(boundaries_xN)
 {
 
 }
 
-double PDEMatrixBuilder::alpha() const
+double PDEMatrixBuilder::alpha(const double& dx, const double& dt) const
 {
-	double alph = boundaries_x0_->pde_->coeff_c() - 2 * (boundaries_x0_->pde_->coeff_a()) / pow(boundaries_x0_->get_dx(), 2);
+	double alph = boundaries_x0_->pde_->coeff_c() - 2 * (boundaries_x0_->pde_->coeff_a()) / pow(dx, 2);
 	return alph;
 }
 
-double PDEMatrixBuilder::beta() const
+double PDEMatrixBuilder::beta(const double& dx, const double& dt) const
 {
-	double bet = (boundaries_x0_->pde_->coeff_a()) / pow(boundaries_x0_->get_dx(), 2) + (boundaries_x0_->pde_->coeff_b()) / (2 * (boundaries_x0_->get_dx()));
+	double bet = (boundaries_x0_->pde_->coeff_a()) / pow(dx, 2) + (boundaries_x0_->pde_->coeff_b()) / (2 * (dx));
 	return bet;
 }
 
-double PDEMatrixBuilder::xi() const
+double PDEMatrixBuilder::xi(const double& dx, const double& dt) const
 {
-	double result = (boundaries_x0_->pde_->coeff_a()) / pow(boundaries_x0_->get_dx(), 2) - (boundaries_x0_->pde_->coeff_b()) / (2 * (boundaries_x0_->get_dx()));
+	double result = (boundaries_x0_->pde_->coeff_a()) / pow(dx, 2) - (boundaries_x0_->pde_->coeff_b()) / (2 * (dx));
 	return result;
 }
 
-Eigen::MatrixXd PDEMatrixBuilder::comp_row_ktilde() const
+Eigen::MatrixXd PDEMatrixBuilder::comp_row_k(const double& dx, const double& dt) const
 {
 	Eigen::MatrixXd res = Eigen::MatrixXd::Zero(1, 3);
-	res(0) = -boundaries_x0_->get_dt() * (1 - boundaries_x0_->get_theta()) * PDEMatrixBuilder::xi();
-	res(1) = 1 - boundaries_x0_->get_dt() * (1 - boundaries_x0_->get_theta()) * PDEMatrixBuilder::alpha();
-	res(2) = -boundaries_x0_->get_dt() * (1 - boundaries_x0_->get_theta()) * PDEMatrixBuilder::beta();
+	res(0) = -dt * (1 - boundaries_x0_->get_theta()) * PDEMatrixBuilder::xi(dx, dt);
+	res(1) = 1 - dt * (1 - boundaries_x0_->get_theta()) * PDEMatrixBuilder::alpha(dx, dt);
+	res(2) = -dt * (1 - boundaries_x0_->get_theta()) * PDEMatrixBuilder::beta(dx, dt);
 	return res;
 }
 
-Eigen::MatrixXd PDEMatrixBuilder::comp_row_k() const
+Eigen::MatrixXd PDEMatrixBuilder::comp_row_ktilde(const double& dx, const double& dt) const
 {
 	Eigen::MatrixXd res = Eigen::MatrixXd::Zero(1, 3);
-	res(0) = boundaries_x0_->get_dt() * boundaries_x0_->get_theta() * PDEMatrixBuilder::xi();
-	res(1) = 1 + boundaries_x0_->get_dt() * boundaries_x0_->get_theta() * PDEMatrixBuilder::alpha();
-	res(2) = boundaries_x0_->get_dt() * boundaries_x0_->get_theta() * PDEMatrixBuilder::beta();
+	res(0) = dt * boundaries_x0_->get_theta() * PDEMatrixBuilder::xi(dx, dt);
+	res(1) = 1 + dt * boundaries_x0_->get_theta() * PDEMatrixBuilder::alpha(dx, dt);
+	res(2) = dt * boundaries_x0_->get_theta() * PDEMatrixBuilder::beta(dx, dt);
 	return res;
 }
 
-Eigen::MatrixXd PDEMatrixBuilder::comp_system_constant() const
+Eigen::MatrixXd PDEMatrixBuilder::comp_system_constant(const int& nb_spot_steps, const double& dx, const double& dt) const
 {
-	Eigen::MatrixXd vect = Eigen::MatrixXd::Constant(get_nb_time_steps() + 1, 1, boundaries_x0_->get_dt() * boundaries_x0_->pde_->coeff_d()); // just a column vector of dim T+1
+	Eigen::MatrixXd vect = Eigen::MatrixXd::Constant(nb_spot_steps + 1, 1, dt * boundaries_x0_->pde_->coeff_d()); // just a column vector of dim T+1
 	return vect;
 }
 
-Eigen::MatrixXd PDEMatrixBuilder::comp_ktilde() const
+Eigen::MatrixXd PDEMatrixBuilder::comp_k(const int& nb_spot_steps, const double& dx, const double& dt) const
 {
-	Eigen::MatrixXd ktilde = Eigen::MatrixXd::Zero(get_nb_time_steps()+1, get_nb_time_steps()+1); // null square matrix of dimension T+1
+	Eigen::MatrixXd k = Eigen::MatrixXd::Zero(nb_spot_steps+1, nb_spot_steps+1); // null square matrix of dimension T+1
 	//Filling the first row (boundary condition in x0):
-	ktilde.block<1, 3>(0, 0) = boundaries_x0_->coeff_fn1();
+	k.block<1, 3>(0, 0) = boundaries_x0_->coeff_fn1(dx, dt);
 	//filling the last row (boundary condition in xN):
-	ktilde.block<1, 3>(get_nb_time_steps(), get_nb_time_steps() - 2) = boundaries_xN_->coeff_fn1();
+	k.block<1, 3>(nb_spot_steps, nb_spot_steps - 2) = boundaries_xN_->coeff_fn1(dx, dt);
 
 	//loop to fill the intermediary rows:
-	for (int i = 1; i < get_nb_time_steps(); i++)
+	for (int i = 1; i < nb_spot_steps; i++)
 	{
-		ktilde.block<1, 3>(i, i - 1) = PDEMatrixBuilder::comp_row_ktilde();
-	}
-	return ktilde;
-}
-
-Eigen::MatrixXd PDEMatrixBuilder::comp_k() const
-{
-	Eigen::MatrixXd k = Eigen::MatrixXd::Zero(get_nb_time_steps()+1, get_nb_time_steps()+1); // null square matrix of dimension T+1
-	//Filling the first row (boundary condition in x0):
-	k.block<1, 3>(0, 0) = boundaries_x0_->coeff_fn();
-	//filling the last row (boundary condition in xN):
-	k.block<1, 3>(get_nb_time_steps(), get_nb_time_steps() - 2) = boundaries_xN_->coeff_fn();
-
-	//loop to fill the intermediary rows:
-	for (int i = 1; i < get_nb_time_steps(); i++)
-	{
-		k.block<1, 3>(i, i - 1) = PDEMatrixBuilder::comp_row_k();
+		k.block<1, 3>(i, i - 1) = PDEMatrixBuilder::comp_row_k(dx, dt);
 	}
 	return k;
+}
+
+Eigen::MatrixXd PDEMatrixBuilder::comp_ktilde(const int& nb_spot_steps, const double& dx, const double& dt) const
+{
+	Eigen::MatrixXd ktilde = Eigen::MatrixXd::Zero(nb_spot_steps +1, nb_spot_steps +1); // null square matrix of dimension T+1
+	//Filling the first row (boundary condition in x0):
+	ktilde.block<1, 3>(0, 0) = boundaries_x0_->coeff_fn(dx, dt);
+	//filling the last row (boundary condition in xN):
+	ktilde.block<1, 3>(nb_spot_steps, nb_spot_steps - 2) = boundaries_xN_->coeff_fn(dx, dt);
+
+	//loop to fill the intermediary rows:
+	for (int i = 1; i < nb_spot_steps; i++)
+	{
+		ktilde.block<1, 3>(i, i - 1) = PDEMatrixBuilder::comp_row_ktilde(dx, dt);
+	}
+	return ktilde;
 }
